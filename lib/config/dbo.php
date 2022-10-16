@@ -61,14 +61,11 @@ class Dbo extends Vars_traitement
         }
     }
 
-
-
     private function connect_to_database()
     {
         try {
 
-            $prepare = $this->dbo_mater->prepare("CREATE DATABASE IF NOT EXISTS " . $this->config->database);
-            if ($prepare->execute()) {
+            if ($this->create_mysql_element("CREATE DATABASE IF NOT EXISTS " . $this->config->database, $this->dbo_mater)) {
                 $this->dbo = new PDO("mysql:host=" . $this->config->host . ";dbname=" . $this->config->database, $this->config->user, $this->config->password, $this->pdo_options);
                 $this->dbo->exec("SET time_zone='$this->offset';");
                 $this->dbo->query('SET NAMES ' . $this->config->encodage);
@@ -78,6 +75,19 @@ class Dbo extends Vars_traitement
             }
         } catch (\Throwable $th) {
             $this->setError($th->getCode(), "Erreut de traitement", $th);
+        }
+    }
+
+    public function create_mysql_element($querry, $dbo = null)
+    {
+        try {
+            $dbo = ($dbo == null) ? $this->getDbo() : $this->dbo_mater;
+
+            $prepare = $dbo->prepare($querry);
+            return $prepare->execute();
+        } catch (\Throwable $th) {
+            $this->setError($th->getCode(), "Erreut de traitement", $th);
+            return false;
         }
     }
 }

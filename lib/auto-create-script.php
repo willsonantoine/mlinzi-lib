@@ -10,7 +10,10 @@ class AutoCreateScript extends Dbo
     {
         $this->all_files = $this->getAllFiles();
         $this->getContaintFiles();
-        var_dump($this->containtScripts);
+
+        foreach ($this->containtScripts as $key => $value) {
+            $this->create_mysql_element($value["script"]);
+        }
     }
 
     public function getContaintFiles()
@@ -33,14 +36,12 @@ class AutoCreateScript extends Dbo
         $all = json_decode($string, false);
         $script = "CREATE TABLE IF NOT EXISTS " . $table . '(';
 
-        foreach ($all as $key => $value) {  
-            $script .= $this->getStringColumn($key,$value->type,$value->isPrimary);
+        foreach ($all as $key => $value) {
+            $script .= $this->getStringColumn($key, $value->type, $value->isPrimary);
         }
 
-        $script = substr($script,0, strlen($script) - 1).');';
+        $script = substr($script, 0, strlen($script) - 1) . ');';
 
         return $script;
     }
-
-   
 }
