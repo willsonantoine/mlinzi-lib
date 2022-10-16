@@ -30,7 +30,7 @@ class Vars_traitement
         return $result;
     }
 
-    public function getStringColumn($name, $type, $isPrimary = false, $size = 255, $default = null)
+    public function getString_Create_Column($name, $type, $isPrimary = false, $size = 255, $default = null)
     {
         $isPrimary = ($isPrimary) ? 'primary key' : '';
         $value = '';
@@ -39,7 +39,10 @@ class Vars_traitement
                 $value = $name . ' int ' . $isPrimary . ',';
                 break;
             case 'string':
-                $value = $name . ' varchar(255) ' . $isPrimary . ',';
+                $value = $name . " varchar($size) " . $isPrimary . ',';
+                break;
+            case 'text':
+                $value = $name . " longtext " . $isPrimary . ',';
                 break;
             case 'number':
                 $value = $name . ' float ' . $isPrimary . ',';
@@ -49,7 +52,64 @@ class Vars_traitement
                 $value = $name . ' text ';
                 break;
         }
-       
+        return $value;
+    }
+
+    public function getString_Alter_Column($table, $name, $type, $isPrimary = false, $isExist = false, $size = 255, $default = null)
+    {
+        $isPrimary = ($isPrimary) ? 'primary key' : '';
+        
+        if (!$isExist) {
+            return  $this->getScriptColumn_create($table, $type, $name);
+        } else {
+            return $this->getScriptColumn($table, $type, $name);
+        }
+    }
+
+    public function getScriptColumn($table, $type, $name)
+    {
+        switch ($type) {
+            case 'integer':
+                $value = "ALTER TABLE $table CHANGE $name $name integer;";
+                break;
+            case 'string':
+                $value = "ALTER TABLE $table CHANGE $name $name varchar(255);";
+                break;
+            case 'text':
+                $value = "ALTER TABLE $table CHANGE $name $name longtext;";
+                break;
+            case 'number':
+                $value = "ALTER TABLE $table CHANGE $name $name float;";
+                break;
+
+            default:
+                $value = "ALTER TABLE $table CHANGE $name $name $type;";
+                break;
+        }
+
+        return $value;
+    }
+
+    public function getScriptColumn_create($table, $type, $name)
+    {
+        switch ($type) {
+            case 'integer':
+                $value = "ALTER TABLE $table ADD $name int;";
+                break;
+            case 'string':
+                $value = "ALTER TABLE $table ADD $name varchar(255);";
+                break;
+            case 'text':
+                $value = "ALTER TABLE $table ADD $name longtext;";
+                break;
+            case 'number':
+                $value = "ALTER TABLE $table ADD $name float;";
+                break;
+
+            default:
+                $value = "ALTER TABLE $table ADD $name $type";
+                break;
+        }
 
         return $value;
     }

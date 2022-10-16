@@ -8,6 +8,11 @@ class Dbo extends Vars_traitement
     public $pdo_options = null;
     public $offset = null;
 
+    public function __construct()
+    {
+        $this->config = json_decode(file_get_contents('./lib/config/dbo_config.json'));
+    }
+
     public function getDbo()
     {
         if ($this->dbo == null) {
@@ -19,8 +24,6 @@ class Dbo extends Vars_traitement
 
     public function con()
     {
-        $this->config = json_decode(file_get_contents('./lib/config/dbo_config.json'));
-
         try {
 
             date_default_timezone_set($this->config->time_zone);
@@ -89,5 +92,53 @@ class Dbo extends Vars_traitement
             $this->setError($th->getCode(), "Erreut de traitement", $th);
             return false;
         }
+    }
+
+    public function getValue($rqt, $data = [])
+    {
+        $var = null;
+        try {
+            $req = $this->getDbo()->prepare($rqt);
+            $req->execute($data);
+            while ($data = $req->fetch(PDO::FETCH_ASSOC)) {
+                $var = $data['i'];
+            }
+        } catch (Exception $exception) {
+            $this->setError(201, "Une erreur s'est produite", $exception);
+        }
+        return $var;
+    }
+
+    public function columnInTable($table, $name)
+    {
+        return $this->existValue("SHOW COLUMNS FROM $table where Field='$name';");
+    }
+
+    public function existValue($rqt, $data = [])
+    {
+        try {
+            $req = $this->getDbo()->prepare($rqt);
+            $req->execute($data);
+            while ($data = $req->fetch(PDO::FETCH_ASSOC)) {
+                return true;
+            }
+        } catch (Exception $exception) {
+            $this->setError(201, "Une erreur s'est produite", $exception);
+        }
+
+        return false;
+    }
+
+    public  function execute($rqt, $data = [], $message_success = "Traitement réussie avec success", $message_erreur = "Une erreur s'est produite")
+    {
+        $bool = false;
+        try {
+            $req = $this->getDbo()->prepare($rqt);
+            $bool = $req->execute($data);
+            return $bool;
+        } catch (\Throwable $exception) {
+            $this->setError(201, "Une erreur s'est produite", $exception);
+        }
+        return false;
     }
 }

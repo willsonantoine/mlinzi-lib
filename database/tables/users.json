@@ -3,21 +3,31 @@
         "type": "integer",
         "isPrimary": true,
         "allowNull": false,
-        "autoincrement": true
+        "autoincrement": true,
+        "default": null
     },
     "username": {
         "type": "string",
         "allowNull": false,
-        "isPrimary": false
+        "isPrimary": false,
+        "default": null
     },
     "password": {
         "type": "string",
         "allowNull": false,
-        "isPrimary": false
+        "isPrimary": false,
+        "default": null
     },
     "email": {
         "type": "string",
         "allowNull": false,
-        "isPrimary": false
+        "isPrimary": false,
+        "default": null
+    },
+    "etat": {
+        "type": "integer",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": 0
     }
 }
