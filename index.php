@@ -2,7 +2,11 @@
 
 include './lib/config/dbo.php';
 
-$dbo = new Dbo();
-$dbo->con();
-
-var_dump($dbo->getError());
+$con = new Dbo();
+ 
+try {
+    $pst = $con->getDbo()->prepare("select * from users");
+    $pst->execute();
+} catch (Exception $e) {
+    var_dump($e);
+}

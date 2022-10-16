@@ -2,8 +2,20 @@
 require './lib/vars-traitement.php';
 class Dbo extends Vars_traitement
 {
+    public $dbo_mater = null;
     public $dbo = null;
     public $config = null;
+    public $pdo_options = null;
+    public $offset = null;
+
+    public function getDbo()
+    {
+        if ($this->dbo == null) {
+            $this->con();
+        }
+
+        return $this->dbo;
+    }
 
     public function con()
     {
@@ -19,11 +31,12 @@ class Dbo extends Vars_traitement
             $mins = abs($mins);
             $hrs = floor($mins / 60);
             $mins -= $hrs * 60;
-            $offset = sprintf('%+d:%02d', $hrs * $sgn, $mins);
-            $pdo_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-            $this->dbo = new PDO("mysql:host=" . $this->config->host . ";dbname=" . $this->config->database . "", $this->config->user, $this->config->password, $pdo_options);
-            $this->dbo->exec("SET time_zone='$offset';");
-            $this->dbo->query('SET NAMES ' . $this->config->encodage);
+            $this->offset = sprintf('%+d:%02d', $hrs * $sgn, $mins);
+            $this->pdo_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+            $this->dbo_mater = new PDO("mysql:host=" . $this->config->host . ";", $this->config->user, $this->config->password, $this->pdo_options);
+            $this->dbo_mater->exec("SET time_zone='$this->offset';");
+            $this->dbo_mater->query('SET NAMES ' . $this->config->encodage);
+            $this->connect_to_database();
         } catch (Exception $exception) {
             $this->isError($exception);
         }
@@ -37,12 +50,34 @@ class Dbo extends Vars_traitement
         switch ($code) {
             case 1049:
                 $this->setError($code, "La base de données n'existe pas", $exception);
+                $this->connect_to_database();
                 break;
             case 1045:
                 $this->setError($code, "Veuillez vérifier le login de cet utilisateur. La connexion au serveur a échoué. ", $exception);
+                break;
             default:
                 $this->setError($code, "Erreut de traitement", $exception);
                 break;
+        }
+    }
+
+
+
+    private function connect_to_database()
+    {
+        try {
+
+            $prepare = $this->dbo_mater->prepare("CREATE DATABASE IF NOT EXISTS " . $this->config->database);
+            if ($prepare->execute()) {
+                $this->dbo = new PDO("mysql:host=" . $this->config->host . ";dbname=" . $this->config->database, $this->config->user, $this->config->password, $this->pdo_options);
+                $this->dbo->exec("SET time_zone='$this->offset';");
+                $this->dbo->query('SET NAMES ' . $this->config->encodage);
+                $this->setError(200, "connexion réussie à la base de données ");
+            } else {
+                $this->setError(500, "Erreur de connexion à la base de données ");
+            }
+        } catch (\Throwable $th) {
+            $this->setError($th->getCode(), "Erreut de traitement", $th);
         }
     }
 }
