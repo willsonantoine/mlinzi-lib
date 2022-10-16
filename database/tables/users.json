@@ -24,6 +24,12 @@
         "isPrimary": false,
         "default": null
     },
+    "adresse": {
+        "type": "string",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": null
+    },
     "etat": {
         "type": "integer",
         "allowNull": false,

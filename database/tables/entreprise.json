@@ -3,21 +3,24 @@
         "type": "integer",
         "isPrimary": true,
         "allowNull": false,
-        "autoincrement": true
+        "default": null
     },
     "name": {
         "type": "string",
         "allowNull": false,
-        "isPrimary": false
+        "isPrimary": false,
+        "default": null
     },
     "phone": {
         "type": "string",
         "allowNull": false,
-        "isPrimary": false
+        "isPrimary": false,
+        "default": null
     },
     "email": {
         "type": "string",
         "allowNull": false,
-        "isPrimary": false
+        "isPrimary": false,
+        "default": null
     }
 }

@@ -11,19 +11,22 @@ class AutoCreateScript extends Dbo
     {
         $this->all_files = $this->getAllFiles();
         $this->getContaintFiles();
-       
+ 
         foreach ($this->containtScripts as $key => $value) {
 
-           // Vérifier si la table existe dans la base de données
-           $table = $value["table"];
-           $db = $this->config->database;
+            // Vérifier si la table existe dans la base de données
+            $table = $value["table"];
+            $db = $this->config->database;
 
-           if ($this->existValue("SHOW  TABLES where Tables_in_$db='$table' ;") == null) {
-              //  Si la table existe, nous la créons
-               $this->create_mysql_element($value["script_create"]);
-           } else {
-                $this->execute($value["script_update"]);
-           }
+            if ($this->existValue("SHOW  TABLES where Tables_in_$db='$table' ;") == null) {
+                // Si la table n 'existe, nous la créons
+                $this->create_mysql_element($value["script_create"]);
+            } else {
+                // Si la table existe, nous modifions les attributs
+                if (strlen($value["script_update"]) > 1) {
+                    $this->execute($value["script_update"]);
+                }
+            }
         }
     }
 
@@ -45,7 +48,7 @@ class AutoCreateScript extends Dbo
         }
     }
 
-    private function generateScript($table, $string, $isAlter = false)
+    private function generateScript($table, $string)
     {
         $all = json_decode($string, false);
 
@@ -53,8 +56,13 @@ class AutoCreateScript extends Dbo
         $script_alter = "";
 
         foreach ($all as $key => $value) {
-            $script .= $this->getString_Create_Column($key, $value->type, $value->isPrimary);
-            $script_alter .= $this->getString_Alter_Column($table, $key, $value->type, $value->isPrimary,$this->columnInTable($table,$key));
+
+            $script .= $this->getString_Create_Column($key, $value);
+
+            $isExist = $this->columnInTable($table, $key);
+
+            $script_alter .= $this->getString_Alter_Column($table, $key, $value->type, $value->isPrimary, $isExist, $value->default);
+
         }
 
         $script = substr($script, 0, strlen($script) - 1) . ');';
