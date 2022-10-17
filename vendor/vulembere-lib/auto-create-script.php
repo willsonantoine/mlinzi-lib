@@ -9,28 +9,27 @@ class AutoCreateScript extends Dbo
     private $all_files = [];
 
     public function Start($current_table)
-    { 
+    {
         echo $current_table;
-         
+
         $this->all_files = $this->getAllFiles();
         $this->getContaintFiles($current_table);
- 
+
         foreach ($this->containtScripts as $key => $value) {
-echo $value["script_update"];
+
             // Vérifier si la table existe dans la base de données
             $table = $value["table"];
             $db = $this->config->database;
-          
+
             if ($this->existValue("SHOW  TABLES where Tables_in_$db='$table' ;") == null) {
                 // Si la table n 'existe, nous la créons
                 $this->create_mysql_element($value["script_create"]);
-            } else { 
+            } else {
                 // Si la table existe, nous modifions les attributs
                 if (strlen($value["script_update"]) > 1) {
-                     
+
                     $this->execute($value["script_update"]);
                 }
-
             }
         }
     }
@@ -39,12 +38,12 @@ echo $value["script_update"];
     {
         foreach ($this->all_files as $key => $table_json) {
             $table = substr($table_json, 0, strpos($table_json, '.'));
-           
+
             if ($current_table == $table) {
                 $vars = file_get_contents("./database/tables/" . $table_json);
 
                 if (strlen($vars) > 0) {
-                 
+
                     $script_genereted = $this->generateScript($table, $vars);
                     $this->containtScripts[] = [
                         "table" => $table,

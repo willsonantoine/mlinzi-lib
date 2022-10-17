@@ -1,5 +1,11 @@
 {
-    "require": {
-        "vendor/package": "1"
-    }
+    "name": "vulembere/mlinzi-lib",
+    "description": "Lib access to database",
+    "authors": [
+        {
+            "name": "vulembere",
+            "email": "willsonantoine@gmail.com"
+        }
+    ],
+    "require": {}
 }
