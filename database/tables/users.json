@@ -1,39 +1,51 @@
 {
     "id": {
-        "type": "integer",
+        "type": "varchar(255)",
         "isPrimary": true,
         "allowNull": false,
         "autoincrement": true,
         "default": null
     },
     "username": {
-        "type": "string",
+        "type": "varchar(255)",
         "allowNull": false,
         "isPrimary": false,
         "default": null
     },
     "password": {
-        "type": "string",
+        "type": "varchar(255)",
         "allowNull": false,
         "isPrimary": false,
         "default": null
     },
     "email": {
-        "type": "string",
+        "type": "varchar(255)",
         "allowNull": false,
         "isPrimary": false,
         "default": null
     },
     "adresse": {
-        "type": "string",
+        "type": "varchar(255)",
         "allowNull": false,
         "isPrimary": false,
         "default": null
     },
     "etat": {
-        "type": "integer",
+        "type": "int",
         "allowNull": false,
         "isPrimary": false,
         "default": 0
+    },
+    "isValid": {
+        "type": "int",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": 1
+    },
+    "date_create": {
+        "type": "DATETIME",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": "CURRENT_TIMESTAMP"
     }
 }

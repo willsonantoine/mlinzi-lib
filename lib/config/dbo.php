@@ -47,8 +47,9 @@ class Dbo extends Vars_traitement
         return $this->dbo;
     }
 
-    private function isError(Exception $exception)
+    private function isError(Exception $exception, $rqt = null)
     {
+        $message = $exception->getMessage();
         $code = $exception->getCode();
         switch ($code) {
             case 1049:
@@ -58,12 +59,31 @@ class Dbo extends Vars_traitement
             case 1045:
                 $this->setError($code, "Veuillez vérifier le login de cet utilisateur. La connexion au serveur a échoué. ", $exception);
                 break;
+            case '42S02':
+                $script = new AutoCreateScript();
+                $script->Start($this->getTableInQuerry($rqt));
+
+                $this->setError($code, "Cette table n'existe pas dans le système. Nous essayons de la créer. Veuillez réessayer plus tard ", $exception);
+                break;
+            case '42S22':
+                $script = new AutoCreateScript(); 
+                $script->Start($this->getTableInQuerry($rqt));
+                 
+                $this->setError($code, "Une colonne n'existe pas dans cette table. Assurez-vous de vérifier ou nous essayons de résoudre le problème.", $exception);
+                break;
             default:
                 $this->setError($code, "Erreut de traitement", $exception);
                 break;
         }
     }
 
+    public function getTableInQuerry($rqt)
+    {
+        $table = substr($rqt, strpos($rqt, 'from') + 5, strlen($rqt));
+        $table = substr($table, 0, strpos($table, ' '));
+        return $table;
+    }
+ 
     private function connect_to_database()
     {
         try {
@@ -89,7 +109,8 @@ class Dbo extends Vars_traitement
             $prepare = $dbo->prepare($querry);
             return $prepare->execute();
         } catch (\Throwable $th) {
-            $this->setError($th->getCode(), "Erreut de traitement", $th);
+
+            $this->isError($th);
             return false;
         }
     }
@@ -104,7 +125,7 @@ class Dbo extends Vars_traitement
                 $var = $data['i'];
             }
         } catch (Exception $exception) {
-            $this->setError(201, "Une erreur s'est produite", $exception);
+            $this->isError($exception, $rqt);
         }
         return $var;
     }
@@ -136,9 +157,24 @@ class Dbo extends Vars_traitement
             $req = $this->getDbo()->prepare($rqt);
             $bool = $req->execute($data);
             return $bool;
-        } catch (\Throwable $exception) {
-            $this->setError(201, "Une erreur s'est produite", $exception);
+        } catch (\Throwable $th) {
+            $this->isError($th, $rqt);
         }
         return false;
+    }
+    public function getAll($rqt, $data = [])
+    {
+        try {
+            $var = [];
+            $req = $this->getDbo()->prepare($rqt);
+            $req->execute($data);
+            while ($data = $req->fetch(PDO::FETCH_ASSOC)) {
+                $var[] = (object) $data;
+            }
+            $req->closeCursor();
+        } catch (Exception $th) {
+            $this->isError($th, $rqt);
+        }
+        return $var;
     }
 }

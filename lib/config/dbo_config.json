@@ -2,7 +2,7 @@
     "host": "localhost",
     "user": "root",
     "password": "root",
-    "database": "bd_isaac4",
+    "database": "test_3",
     "time_zone": "Africa/Cairo",
     "encodage": "UTF8"
 }

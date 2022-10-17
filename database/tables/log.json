@@ -1,0 +1,27 @@
+{
+    "id": {
+        "type": "integer",
+        "isPrimary": true,
+        "allowNull": false,
+        "autoincrement": true,
+        "default": null
+    },
+    "text_error": {
+        "type": "text",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": null
+    },
+    "table": {
+        "type": "string",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": null
+    },
+    "etat": {
+        "type": "integer",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": 0
+    }
+}
