@@ -1,6 +1,5 @@
 <?php
-
-use phpDocumentor\Reflection\Types\Boolean;
+ 
 
 class Vars_traitement
 {
