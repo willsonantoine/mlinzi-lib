@@ -1,6 +1,6 @@
 <?php
 
-require './lib/autoloader.php';
+require './vendor/vulembere-lib/autoloader.php';
 
 $cls = new AutoCreateScript();
 $dbo = new Dbo();
