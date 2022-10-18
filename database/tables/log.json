@@ -1,27 +1,39 @@
 {
     "id": {
-        "type": "integer",
+        "type": "int",
         "isPrimary": true,
         "allowNull": false,
         "autoincrement": true,
         "default": null
     },
     "text_error": {
-        "type": "text",
+        "type": "varchar(255)",
         "allowNull": false,
         "isPrimary": false,
         "default": null
     },
     "table": {
-        "type": "string",
+        "type": "varchar(255)",
         "allowNull": false,
         "isPrimary": false,
         "default": null
     },
     "etat": {
-        "type": "integer",
+        "type": "int",
         "allowNull": false,
         "isPrimary": false,
         "default": 0
+    },
+    "createAt": {
+        "type": "DATETIME",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": "CURRENT_TIMESTAMP"
+    },
+    "updateAt": {
+        "type": "DATETIME",
+        "allowNull": false,
+        "isPrimary": false,
+        "default": "CURRENT_TIMESTAMP"
     }
 }

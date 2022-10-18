@@ -3,17 +3,18 @@
 include './vendor/vulembere-lib/vars-traitement.php';
 include './vendor/vulembere-lib/dbo.php';
 
-class AutoCreateScript extends Dbo
+class AutoCreateScript extends Dbo_vulembere_lib
 {
     private $containtScripts = [];
     private $all_files = [];
 
-    public function Start($current_table)
-    {
-        echo $current_table;
-
+    public function Start($current_table = null)
+    { 
         $this->all_files = $this->getAllFiles();
+
         $this->getContaintFiles($current_table);
+
+        // var_dump($this->containtScripts);
 
         foreach ($this->containtScripts as $key => $value) {
 
@@ -37,9 +38,9 @@ class AutoCreateScript extends Dbo
     public function getContaintFiles($current_table)
     {
         foreach ($this->all_files as $key => $table_json) {
-            $table = substr($table_json, 0, strpos($table_json, '.'));
 
-            if ($current_table == $table) {
+            $table = substr($table_json, 0, strpos($table_json, '.'));
+            
                 $vars = file_get_contents("./database/tables/" . $table_json);
 
                 if (strlen($vars) > 0) {
@@ -51,7 +52,7 @@ class AutoCreateScript extends Dbo
                         "script_update" =>  $script_genereted[1],
                     ];
                 }
-            }
+            
         }
     }
 
@@ -65,10 +66,13 @@ class AutoCreateScript extends Dbo
         foreach ($all as $key => $value) {
 
             $script .= $this->getString_Create_Column($key, $value);
+            $db = $this->config->database;
 
-            $isExist = $this->columnInTable($table, $key);
+            if ($this->existValue("SHOW  TABLES where Tables_in_$db='$table' ;") != null) {
+                $isExist = $this->columnInTable($table, $key);
 
-            $script_alter .= $this->getString_Alter_Column($table, $key, $value->type, $value->isPrimary, $isExist, $value->default);
+                $script_alter .= $this->getString_Alter_Column($table, $key, $value->type, $value->isPrimary, $isExist, $value->default);
+            }
         }
 
         $script = substr($script, 0, strlen($script) - 1) . ');';
