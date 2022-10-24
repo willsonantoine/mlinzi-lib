@@ -24,6 +24,7 @@ class AutoCreateScript extends Dbo_vulembere_lib
 
             if ($this->existValue("SHOW  TABLES where Tables_in_$db='$table' ;") == null) {
                 // Si la table n 'existe, nous la créons
+     
                 $this->create_mysql_element($value["script_create"]);
             } else {
                 // Si la table existe, nous modifions les attributs
@@ -67,7 +68,7 @@ class AutoCreateScript extends Dbo_vulembere_lib
 
             $script .= $this->getString_Create_Column($key, $value);
             $db = $this->config->database;
-
+ 
             if ($this->existValue("SHOW  TABLES where Tables_in_$db='$table' ;") != null) {
                 $isExist = $this->columnInTable($table, $key);
 
@@ -76,7 +77,7 @@ class AutoCreateScript extends Dbo_vulembere_lib
         }
 
         $script = substr($script, 0, strlen($script) - 1) . ');';
-
+         
         return [$script, $script_alter];
     }
 }

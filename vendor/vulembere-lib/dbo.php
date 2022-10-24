@@ -79,34 +79,34 @@ class Dbo_vulembere_lib extends Vars_traitement
         $code = $exception->getCode();
         switch ($code) {
             case 1049:
-                $this->setError($code, "La base de données n'existe pas", $exception);
+                $this->setError($code, "La base de données n'existe pas", $exception, $rqt);
                 $this->connect_to_database();
                 break;
             case 1045:
-                $this->setError($code, "Veuillez vérifier le login de cet utilisateur. La connexion au serveur a échoué. ", $exception);
+                $this->setError($code, "Veuillez vérifier le login de cet utilisateur. La connexion au serveur a échoué. ", $exception, $rqt);
                 break;
             case '42S02':
                 $script = new AutoCreateScript();
 
                 $script->Start($this->getTableInQuerry($rqt));
 
-                $this->setError($code, "Cette table n'existe pas dans le système. Nous essayons de la créer. Veuillez réessayer plus tard ", $exception);
+                $this->setError($code, "Cette table n'existe pas dans le système. Nous essayons de la créer. Veuillez réessayer plus tard ", $exception, $rqt);
                 break;
             case '22001':
                 $script = new AutoCreateScript();
 
                 $script->Start($this->getTableInQuerry($rqt));
 
-                $this->setError($code, "Cette table n'existe pas dans le système. Nous essayons de la créer. Veuillez réessayer plus tard ", $exception);
+                $this->setError($code, "Cette table n'existe pas dans le système. Nous essayons de la créer. Veuillez réessayer plus tard ", $exception, $rqt);
                 break;
             case '42S22':
                 $script = new AutoCreateScript();
                 $script->Start($this->getTableInQuerry($rqt));
 
-                $this->setError($code, "Une colonne n'existe pas dans cette table. Assurez-vous de vérifier ou nous essayons de résoudre le problème.", $exception);
+                $this->setError($code, "Une colonne n'existe pas dans cette table. Assurez-vous de vérifier ou nous essayons de résoudre le problème.", $exception, $rqt);
                 break;
             default:
-                $this->setError($code, "Erreut de traitement", $exception);
+                $this->setError($code, "Erreut de traitement", $exception, $rqt);
                 break;
         }
         $this->setResponse($message_erreur, 201);
@@ -154,7 +154,7 @@ class Dbo_vulembere_lib extends Vars_traitement
             return $prepare->execute();
         } catch (\Throwable $th) {
 
-            $this->isError($th);
+            $this->isError($th,$querry);
             return false;
         }
     }
@@ -366,7 +366,7 @@ class Dbo_vulembere_lib extends Vars_traitement
         } catch (Exception $e) {
             $observation =  $e->getMessage();
         }
-        $id_ = random_int(100000,900000);
+        $id_ = random_int(100000, 900000);
 
         $this->execute(
             "INSERT INTO historique_email SET id=?, id_user=?,object=?,message=?,observation=?,etat=? ",
